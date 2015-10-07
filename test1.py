@@ -23,13 +23,13 @@ def addQuery():
 def getQuery():
 	if request.method == 'GET':
 		try:
-			main_list, chart_list = show_output();
-			return render_template('userHome.html', name = main_list, charts = chart_list);
+			main_list = show_output();
+			return render_template('userHome.html', name = main_list);
 		except Exception as e:
 			return json.dumps({'error':str(e)})
 	else: 
 		try:
-			user_query();
+			userQuery();
 			return redirect('/userHome')
 		except Exception as e:
 			return json.dumps({'error':str(e)})
@@ -37,48 +37,30 @@ def getQuery():
 # This function returns data that is used to draw charts
 def show_output():
 	main_list = []
-
-	index_list = []
-	chart_list = []
 	
 	conn = mysql.connect()
 	cursor = conn.cursor()
 
-	cursor.execute("SELECT DISTINCT chart FROM output;")
-	chart_list = cursor.fetchall()
-
-	cursor.execute("SELECT DISTINCT query_index FROM output;")
+	cursor.execute("SELECT DISTINCT uid FROM a;")
 	query_indexes = cursor.fetchall()
 
 	for index in query_indexes:
 		outer_list = []
-		result_list = []
-		
-		curr_index = int(index[0])	
-
-		sql = "SELECT DISTINCT chart FROM output WHERE query_index = %d;" % (curr_index)
-		cursor.execute(sql)
-		chart_list = cursor.fetchall()
-
-		sql = "SELECT field1, field2 FROM output WHERE query_index = %d;" % (curr_index)
+		curr_index = int(index[0])
+		sql = "SELECT query, chart FROM a WHERE uid = %d;" % (curr_index)
 		cursor.execute(sql)
 		data = cursor.fetchall()
-		
-		for result in data:
-			result_dict = [int(result[0]),int(result[1])]
-			result_list.append(result_dict)
-
-		outer_list.append(result_list)
-		outer_list.append(str(chart_list[0][0]))
+		outer_list.append(json.loads(data[0][0]))
+		outer_list.append(str(data[0][1]))
 		main_list.append(outer_list)
 
 	cursor.close() 
 	conn.close()
 
-	return main_list, chart_list
+	return main_list
 
 # This function inputs the user query and stores the returned data
-def user_query():
+def userQuery():
 	order_list = []
 			
 	conn = mysql.connect()
@@ -86,7 +68,7 @@ def user_query():
 	
 	cursor.execute("UPDATE check_val SET last_val = last_val + 1 WHERE uid = 1;")
 	data2 = cursor.fetchall()
-	
+
 	chart_type = request.form.get('chartType')
 	
 	sql = request.form['inputQuery']
@@ -94,21 +76,12 @@ def user_query():
 	data = cursor.fetchall()
 
 	for order in data:
-		order_dict = {
-			'field1' : order[0],
-			'field2' : order[1] }
-
-		cursor.execute("SELECT last_val FROM check_val;")
-		data2 = cursor.fetchall()
-		
-		query = "INSERT INTO output(field1,field2,query_index,chart) VALUES (%s,%s,%s,'%s');" % (order_dict['field1'], order_dict['field2'],int(data2[0][0]),str(chart_type))
-		cursor.execute(query)
-		
-		conn.commit()
+		order_dict = [ order[0], order[1] ]
 		order_list.append(order_dict)
 	
-	print order_list
-
+	sqlQuery = "INSERT INTO a(query,chart,user_query) VALUES('%s','%s','%s');" % ((json.dumps(order_list)),str(chart_type),sql)
+	cursor.execute(sqlQuery)
+	conn.commit()
 	cursor.close() 
 	conn.close()
 
