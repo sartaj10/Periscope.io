@@ -6,3 +6,4 @@ select * from check_val;
 SELECT ordernum,value FROM orders;
 SELECT ordernum,amount FROM orders;
 SELECT value,amount FROM orders;
+SELECT amount,value FROM orders;

@@ -3,10 +3,15 @@
 <head>
     <title>Periscope</title> 
     <link href="../static/css/bootstrap.min.css" rel="stylesheet">
-    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+    <link href="../static/css/jumbotron-narrow.css" rel="stylesheet">
     <script src="../static/js/jquery-1.11.3.min.js"></script>
     <script>
     
+    $(function () 
+      {
+        $('#result').append('');
+        
+      });
     </script>
 </head>
  
@@ -38,6 +43,18 @@
                             <textarea class="form-control" id="txtPost" name="inputQuery"></textarea>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="chartType">Chart Type</label>
+                        <br>
+                        <div class="col-md-4">
+                            <select name="chartType">
+                                <option value="line">line</option>
+                                <option value="bar">bar</option>
+                                <option value="column">column</option>
+                                <option value="pie">pie</option>
+                            </select>
+                        </div>
+                    </div>
                     <!-- Button -->
                     <div class="form-group">
                         <label class="col-md-4 control-label" for="singlebutton"></label>
@@ -48,6 +65,10 @@
                 </fieldset>
             </form>
         </section>
+
+        <p id = "result">
+
+        </p>
 
     </div>
 </body>

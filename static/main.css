@@ -52,3 +52,7 @@ button:active {
     box-shadow: 0 0 1px 1px #E3E3E3 inset;
     color: #000000;
 }
+
+.mine {
+    float: left;
+}
