@@ -45,11 +45,14 @@ def show_output():
 	query_indexes = cursor.fetchall()
 
 	for index in query_indexes:
+
 		outer_list = []
 		curr_index = int(index[0])
+		
 		sql = "SELECT query, chart FROM a WHERE uid = %d;" % (curr_index)
 		cursor.execute(sql)
 		data = cursor.fetchall()
+		
 		outer_list.append(json.loads(data[0][0]))
 		outer_list.append(str(data[0][1]))
 		main_list.append(outer_list)
@@ -61,8 +64,7 @@ def show_output():
 
 # This function inputs the user query and stores the returned data
 def userQuery():
-	order_list = []
-			
+	main = []	
 	conn = mysql.connect()
 	cursor = conn.cursor()
 	
@@ -73,17 +75,81 @@ def userQuery():
 	
 	sql = request.form['inputQuery']
 	cursor.execute(sql)
-	data = cursor.fetchall()
+	query_return = cursor.fetchall()
 
-	for order in data:
-		order_dict = [ order[0], order[1] ]
-		order_list.append(order_dict)
-	
-	sqlQuery = "INSERT INTO a(query,chart,user_query) VALUES('%s','%s','%s');" % ((json.dumps(order_list)),str(chart_type),sql)
-	cursor.execute(sqlQuery)
-	conn.commit()
-	cursor.close() 
-	conn.close()
+	if(len(cursor.description) == 3):
+
+		# Find parameters after SELECT
+		val1 = cursor.description[0][0] 
+		val2 = cursor.description[1][0] 
+		val3 = cursor.description[2][0]
+
+		# Find Table Name
+		query_words = sql.split()
+		N = len(query_words)
+		for i in range(N):
+			if query_words[i] == 'FROM' or query_words[i] == 'from':
+				table_name = query_words[i+1]
+				break
+		
+		for i in range(N):
+			if query_words[i] == 'ORDER' or query_words[i] == 'order':
+				order_name = query_words[i+2]
+				break
+
+		print order_name
+
+		query = "SELECT DISTINCT " + order_name + " FROM " + table_name + ";"
+
+		cursor.execute(query)
+		data = cursor.fetchall() 
+		
+		for order in data:
+			
+			order_list = []
+			
+			query = "SELECT " + str(val2) + "," + str(val3) + " FROM " + table_name + " WHERE " + str(order_name) + " = '" + str(order[0]) + "';"
+			cursor.execute(query)
+			data2 = cursor.fetchall()
+			
+			for value in data2 :
+				order_dict = [ int(value[0]), int(value[1]) ]
+				order_list.append(order_dict)
+			
+			series_name = {
+				'name' : str(order[0]),
+				'data' : order_list
+			}
+			main.append(series_name)
+		
+		sqlQuery = "INSERT INTO a(query,chart,user_query) VALUES('%s','%s','%s');" % ((json.dumps(main)),str(chart_type),sql)
+		cursor.execute(sqlQuery)
+		
+		conn.commit()
+		cursor.close() 
+		conn.close()
+
+	else:
+
+		main = []
+		order_list = []
+		for order in query_return:
+			order_dict = [ int(order[0]), int(order[1]) ]
+			order_list.append(order_dict)
+		
+		series_name = {
+				'name' : 'Chart',
+				'data' : order_list
+		}
+
+		main.append(series_name)
+		
+		sqlQuery = "INSERT INTO a(query,chart,user_query) VALUES('%s','%s','%s');" % ((json.dumps(main)),str(chart_type),sql)
+		cursor.execute(sqlQuery)
+
+		conn.commit()
+		cursor.close() 
+		conn.close()
 
 # App Run
 if __name__ == '__main__':

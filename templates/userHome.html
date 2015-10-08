@@ -12,20 +12,19 @@
     <script src="http://code.highcharts.com/modules/exporting.js"></script>
     <!--<script src="../static/js/main.js"></script>-->
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
-    
+
     <script>
       $(function () 
       {
-        {% for n in name %}
-          $('#main').append('<div id={{loop.index}} class = "mine" style = "width: 300px; height: 300px; diplay:inline">');
-          //$('#content').append('{{n[0]}}<br><br>');
+        {% for val in name %}
+          $('#main').append('<div id={{loop.index}} class = "mine" style = "width: 350px; height: 350px; diplay:inline">');
           $('#{{loop.index}}').highcharts(
           {
             chart: {
-                type: '{{ n[1]|safe }}'
+                type: '{{ val[1]|safe }}'
             },
             title: {
-                text: 'Output'
+                text: 'Chart'
             },
             xAxis: {
                 type: 'linear',
@@ -34,18 +33,26 @@
                 }
             },
             yAxis: {
+                type: 'linear',
                 min: 0,
                 title: {
                     text: 'Y-Axis'
                 }
             },
             legend: {
-                enabled: false
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
             },
-            series: [{
-                name: 'Chart',
-                data: {{ n[0]|safe }}
-            }]
+            series: [
+            {% for serie in val[0] %}
+            {
+                name: "{{ serie['name']|safe}}",
+                data: {{ serie['data']|safe}}
+            },
+            {% endfor %}
+            ]
           });
         {% endfor %}
       });
@@ -66,7 +73,7 @@
       <div>
 
       <div id = "main">
-
+      <p id = "content"> </p>
       </div>
   
   </body>
