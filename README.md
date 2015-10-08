@@ -6,3 +6,5 @@ Flask has been used as a framework for developing the backend whereas Highcharts
 ![Alt text](https://github.com/sartaj10/Periscope.io/blob/master/Screen%20Shot%202015-10-07%20at%206.58.39%20pm.png "Query Screen")
 
 ![Alt text](https://github.com/sartaj10/Periscope.io/blob/master/Screen%20Shot%202015-10-07%20at%206.58.45%20pm.png "Query Screen")
+
+![Alt text](https://github.com/sartaj10/Periscope.io/blob/master/Screen%20Shot%202015-10-08%20at%202.06.17%20pm.png "Query Screen")
