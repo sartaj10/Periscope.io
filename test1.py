@@ -63,8 +63,6 @@ def editChart():
 
 		return redirect('/userHome')
 
-
-''' ---------------------------------------------------- '''
 # This function returns data that is used to draw charts
 def show_output():
 	main_list = []
