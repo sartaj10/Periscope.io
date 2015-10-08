@@ -17,14 +17,16 @@
       $(function () 
       {
         {% for val in name %}
+
           $('#main').append('<div id={{loop.index}} class = "mine" style = "width: 350px; height: 350px; diplay:inline">');
+          $('#main').append('<button href="#" id = {{loop.index}} class = "btn btn-default btn-sm"><span class="glyphicon glyphicon-pencil"></span></button>');
           $('#{{loop.index}}').highcharts(
           {
             chart: {
                 type: '{{ val[1]|safe }}'
             },
             title: {
-                text: ''
+                text: 'Chart'
             },
             xAxis: {
                 type: 'linear',
@@ -38,6 +40,15 @@
                 title: {
                     text: '{{ val[3]|safe }}'
                 }
+            },
+            labels: {
+              items: [{
+                style: {
+                    left: '50px',
+                    top: '18px',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                }
+              }]
             },
             legend: {
                 layout: 'vertical',
@@ -55,6 +66,11 @@
             ]
           });
         {% endfor %}
+      
+        $(".btn").click(function() {
+          window.location.replace('/editChart?chart_num='+this.id);
+        });
+
       });
     </script>
   </head>
@@ -73,7 +89,8 @@
       <div>
 
       <div id = "main">
-      <p id = "content"> </p>
+    
+
       </div>
   
   </body>

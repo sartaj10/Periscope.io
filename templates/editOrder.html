@@ -5,14 +5,6 @@
     <link href="../static/css/bootstrap.min.css" rel="stylesheet">
     <link href="../static/css/jumbotron-narrow.css" rel="stylesheet">
     <script src="../static/js/jquery-1.11.3.min.js"></script>
-    <script>
-    
-    $(function () 
-      {
-        $('#result').append('');
-        
-      });
-    </script>
 </head>
  
 <body>
@@ -21,9 +13,7 @@
             <nav>
                 <ul class="nav nav-pills pull-right">
                     <li role="presentation"><a href="/userHome">User Home</a>
-                    </li>
-                    <li role="presentation" class="active"><a href="/showAddQuery">Add Query</a>
-                    </li>                
+                    </li>             
                 </ul>
             </nav>
             <h3 class="text-muted">Periscope</h3>
@@ -32,25 +22,29 @@
         <!-- Form Adds Here -->
         <section>
             <!-- a post call is made to /addWish when we click Run on the query -->
-            <form class="form-horizontal" method="post" action="/userHome">
+            <form class="form-horizontal" method="post" action="/editChart?chart_num={{chartID|safe}}">
                 <fieldset>
                     <!-- Form Name -->
-                    <legend>Add Query</legend>
+                    <legend>Edit Query</legend>
                     <!-- Textarea -->
                     <div class="form-group">
                         <label class="col-md-4 control-label" for="txtPost">Post</label>
                         <div class="col-md-4">
-                            <textarea class="form-control" id="txtPost" name="inputQuery"></textarea>
+                            <textarea class="form-control" id="txtPost" name="inputQuery" style="width: 350px; height: 100px;">{{ query|safe }}</textarea>
                         </div>
+                        <div class="col-md-4">
+                            <input type = "hidden" name = "chart_num" value = "{{chartID|safe}}">
+                        </div>
+                        
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label" for="chartType">Chart Type</label>
                         <br>
                         <div class="col-md-4">
                             <select name="chartType">
-                                <option value="line">Line</option>
-                                <option value="bar">Bar</option>
-                                <option value="column">Column</option>
+                                <option value="line">line</option>
+                                <option value="bar">bar</option>
+                                <option value="column">column</option>
                                 <option value="area">Area</option>
                                 <option value="scatter">Scatter</option>
                             </select>
@@ -60,7 +54,7 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label" for="singlebutton"></label>
                         <div class="col-md-4">
-                            <input id="singlebutton" name="singlebutton" class="btn btn-primary" type="submit" value="Run" />
+                            <input id="singlebutton" name="singlebutton" class="btn btn-primary" type="submit" value="Update" />
                         </div>
                     </div>
                 </fieldset>

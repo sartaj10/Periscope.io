@@ -34,6 +34,37 @@ def getQuery():
 		except Exception as e:
 			return json.dumps({'error':str(e)})
 
+@app.route('/editChart',methods = ['POST','GET'])
+def editChart():
+	
+	if request.method == 'GET':
+		
+		chart_id = request.args.get('chart_num')
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		
+		sql = "SELECT user_query FROM a WHERE uid = %s;" % (chart_id)
+		cursor.execute(sql)
+		data = cursor.fetchall()
+		
+		return render_template('editOrder.html', query = str(data[0][0]), chartID = chart_id);
+	
+	else:
+		
+		chart_type = request.form.get('chartType')
+		chart_id = request.args.get('chart_num')
+
+		conn = mysql.connect()
+		cursor = conn.cursor()
+
+		sql = "UPDATE a SET chart = '%s' WHERE uid = %s;" % (chart_type, chart_id)
+		cursor.execute(sql)
+		conn.commit()
+
+		return redirect('/userHome')
+
+
+''' ---------------------------------------------------- '''
 # This function returns data that is used to draw charts
 def show_output():
 	main_list = []
