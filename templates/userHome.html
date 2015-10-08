@@ -24,19 +24,19 @@
                 type: '{{ val[1]|safe }}'
             },
             title: {
-                text: 'Chart'
+                text: ''
             },
             xAxis: {
                 type: 'linear',
                 title: {
-                    text: 'X-Axis'
+                    text: '{{ val[2]|safe }}'
                 }
             },
             yAxis: {
                 type: 'linear',
                 min: 0,
                 title: {
-                    text: 'Y-Axis'
+                    text: '{{ val[3]|safe }}'
                 }
             },
             legend: {

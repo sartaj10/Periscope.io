@@ -49,12 +49,14 @@ def show_output():
 		outer_list = []
 		curr_index = int(index[0])
 		
-		sql = "SELECT query, chart FROM a WHERE uid = %d;" % (curr_index)
+		sql = "SELECT query, chart, xaxis, yaxis FROM a WHERE uid = %d;" % (curr_index)
 		cursor.execute(sql)
 		data = cursor.fetchall()
 		
 		outer_list.append(json.loads(data[0][0]))
 		outer_list.append(str(data[0][1]))
+		outer_list.append(str(data[0][2]))
+		outer_list.append(str(data[0][3]))
 		main_list.append(outer_list)
 
 	cursor.close() 
@@ -81,8 +83,8 @@ def userQuery():
 
 		# Find parameters after SELECT
 		val1 = cursor.description[0][0] 
-		val2 = cursor.description[1][0] 
-		val3 = cursor.description[2][0]
+		val2 = cursor.description[1][0] # month
+		val3 = cursor.description[2][0] # temperature
 
 		# Find Table Name
 		query_words = sql.split()
@@ -96,8 +98,6 @@ def userQuery():
 			if query_words[i] == 'ORDER' or query_words[i] == 'order':
 				order_name = query_words[i+2]
 				break
-
-		print order_name
 
 		query = "SELECT DISTINCT " + order_name + " FROM " + table_name + ";"
 
@@ -122,7 +122,7 @@ def userQuery():
 			}
 			main.append(series_name)
 		
-		sqlQuery = "INSERT INTO a(query,chart,user_query) VALUES('%s','%s','%s');" % ((json.dumps(main)),str(chart_type),sql)
+		sqlQuery = "INSERT INTO a(query,chart,user_query,xaxis,yaxis) VALUES('%s','%s','%s','%s','%s');" % ((json.dumps(main)),str(chart_type),sql,val2,val3)
 		cursor.execute(sqlQuery)
 		
 		conn.commit()
@@ -130,6 +130,9 @@ def userQuery():
 		conn.close()
 
 	else:
+
+		val2 = cursor.description[0][0] 
+		val3 = cursor.description[1][0]
 
 		main = []
 		order_list = []
@@ -144,7 +147,7 @@ def userQuery():
 
 		main.append(series_name)
 		
-		sqlQuery = "INSERT INTO a(query,chart,user_query) VALUES('%s','%s','%s');" % ((json.dumps(main)),str(chart_type),sql)
+		sqlQuery = "INSERT INTO a(query,chart,user_query,xaxis,yaxis) VALUES('%s','%s','%s','%s','%s');" % ((json.dumps(main)),str(chart_type),sql,val2,val3)
 		cursor.execute(sqlQuery)
 
 		conn.commit()
