@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, json, url_for
 from flask.ext.mysql import MySQL
+import sqlparse
 
 mysql = MySQL()
 app = Flask(__name__)
@@ -40,13 +41,29 @@ def getQuery():
 # Edit Chart 
 @app.route('/editChart',methods = ['POST','GET'])
 def editChart():
-	
 	if request.method == 'GET':
 		data, chart_id = get_chart();
-		return render_template('editOrder.html', query = str(data[0][0]), chartID = chart_id);
+		return render_template('editOrder.html', query = str(data[0][0]), chartID = chart_id, chart_type = str(data[0][1]));
 	else:
-		update_chart();
-		return redirect('/userHome')
+		main_list, chart_id = update_chart();
+		return render_template('editOrder.html', name = main_list )
+
+# Delete Chart
+@app.route('/deleteChart',methods = ['GET'])
+def deleteChart():
+	chart_id = delete_chart();
+	return redirect('/userHome')
+
+def delete_chart():
+	chart_id = request.args.get('chart_num')
+	conn = mysql.connect()
+	cursor = conn.cursor()
+
+	sql = "DELETE FROM a WHERE uid = %s;" % (chart_id)
+	cursor.execute(sql)
+	conn.commit()
+
+	return chart_id
 
 # Get chart data for editing
 def get_chart():
@@ -55,9 +72,10 @@ def get_chart():
 	conn = mysql.connect()
 	cursor = conn.cursor()
 	
-	sql = "SELECT user_query FROM a WHERE uid = %s;" % (chart_id)
+	sql = "SELECT user_query, chart FROM a WHERE uid = %s;" % (chart_id)
 	cursor.execute(sql)
 	data = cursor.fetchall()
+	print data
 
 	return data,chart_id
 
@@ -72,6 +90,22 @@ def update_chart():
 	sql = "UPDATE a SET chart = '%s' WHERE uid = %s;" % (chart_type, chart_id)
 	cursor.execute(sql)
 	conn.commit()
+
+	sql = "SELECT query, chart, xaxis, yaxis FROM a WHERE uid = %s;" % (chart_id)
+	cursor.execute(sql)
+	data = cursor.fetchall()
+	
+	main_list = []
+	outer_list = []
+
+	outer_list = append_list(data,outer_list)
+	main_list.append(outer_list)
+
+	conn.commit()
+	cursor.close() 
+	conn.close()
+
+	return main_list, chart_id
 
 # This function returns data that is used to draw charts
 def show_output():

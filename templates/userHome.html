@@ -13,6 +13,13 @@
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
 
     <script>
+    {% if deleted == true %}
+    console.log("YES")
+    {% endif %}
+    </script>
+
+
+    <script>
       $(function () 
       {
 
@@ -58,6 +65,13 @@
             ],
             exporting: {
               buttons: {
+                custom: {
+                  text: "Delete",
+                  id : {{loop.index}},
+                  onclick : function () {
+                    window.location.replace('/deleteChart?chart_num='+{{loop.index}});
+                  }                
+                },
                 customButton: {
                   text: "Edit",
                   id : {{loop.index}},
@@ -92,7 +106,6 @@
       <div>
 
       <div id = "main">
-    
 
       </div>
   

@@ -5,6 +5,62 @@
     <link href="../static/css/bootstrap.min.css" rel="stylesheet">
     <link href="../static/css/jumbotron-narrow.css" rel="stylesheet">
     <script src="../static/js/jquery-1.11.3.min.js"></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
+
+    <script>
+      $(function () 
+      {
+        {% for val in name %}
+
+          $('#main').append('<div id={{loop.index}} class = "mine" style = "width: 350px; height: 350px; diplay:inline">');
+          
+          var hc = 
+          {
+            chart: {
+                type: '{{ val[1]|safe }}'
+            },
+            title: {
+                text: 'Chart'
+            },
+            xAxis: {
+                type: 'linear',
+                title: {
+                    text: '{{ val[2]|safe }}'
+                }
+            },
+            yAxis: {
+                type: 'linear',
+                min: 0,
+                title: {
+                    text: '{{ val[3]|safe }}'
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [
+            {% for serie in val[0] %}
+            {
+                name: "{{ serie['name']|safe}}",
+                data: {{ serie['data']|safe}}
+            },
+            {% endfor %}
+            ]
+        }
+
+        $('#{{loop.index}}').highcharts(hc);
+        {% endfor %}
+        
+      });
+    </script>
+
 </head>
  
 <body>
@@ -43,11 +99,11 @@
                         <br>
                         <div class="col-md-4">
                             <select name="chartType">
-                                <option value="line">line</option>
-                                <option value="bar">bar</option>
-                                <option value="column">column</option>
-                                <option value="area">Area</option>
-                                <option value="scatter">Scatter</option>
+                                <option value="line" {% if chart_type == 'line' %} selected="selected"{% endif %}>line</option>
+                                <option value="bar" {% if chart_type == 'bar' %} selected="selected"{% endif %}>bar</option>
+                                <option value="column" {% if chart_type == 'column' %} selected="selected"{% endif %}>column</option>
+                                <option value="area" {% if chart_type == 'area' %} selected="selected"{% endif %}>Area</option>
+                                <option value="scatter" {% if chart_type == 'scatter' %} selected="selected"{% endif %}>Scatter</option>
                             </select>
                         </div>
                     </div>
@@ -62,9 +118,9 @@
             </form>
         </section>
 
-        <p id = "result">
+        <div id = "main">
 
-        </p>
+        </div>
 
     </div>
 </body>
