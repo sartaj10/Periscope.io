@@ -75,7 +75,6 @@ def get_chart():
 	sql = "SELECT user_query, chart FROM a WHERE uid = %s;" % (chart_id)
 	cursor.execute(sql)
 	data = cursor.fetchall()
-	print data
 
 	return data,chart_id
 
@@ -186,6 +185,7 @@ def userQuery():
 				order_dict = [ int(value[0]), int(value[1]) ]
 				order_list.append(order_dict)
 			
+			order_list.sort(key=lambda x: x[0])
 			series_name = {
 				'name' : str(order[0]),
 				'data' : order_list
@@ -203,6 +203,7 @@ def userQuery():
 			order_dict = [ int(order[0]), int(order[1]) ]
 			order_list.append(order_dict)
 		
+		order_list.sort(key=lambda x: x[0])
 		series_name = {
 				'name' : 'Chart',
 				'data' : order_list

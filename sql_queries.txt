@@ -21,3 +21,7 @@ SELECT city, rain, temp FROM temperature ORDER BY city ;
 SELECT value, amount FROM orders ;
 SELECT ordernum, value FROM orders ;
 SELECT ordernum, amount FROM orders ;
+
+
+select city, month, temp from new order by city ;
+select country, month, temp from new order by country ;
