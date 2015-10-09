@@ -1,7 +1,18 @@
-truncate output;
-truncate check_val;
-INSERT INTO check_val(last_val,uid,chart_val) VALUES (0,1,0);
-select * from check_val;
+1. Create Table orders
+
+2. Create Table temperature
+
+3. Create Table check_val
+
+4. Create Table a
+
+5. truncate a;
+
+6. truncate check_val;
+
+7. INSERT INTO check_val(last_val,uid,chart_val) VALUES (0,1,0);
+
+Queries ---
 
 SELECT city, month, temp FROM temperature ORDER BY city ;
 SELECT city, month, rain FROM temperature ORDER BY city ;

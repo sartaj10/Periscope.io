@@ -11,57 +11,67 @@ app.config['MYSQL_DATABASE_DB'] = 'test2'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
+# Home Page
 @app.route('/')
 def main():
 	return render_template('index.html')
 
-@app.route('/showAddQuery')
+# Add Query Page
+@app.route('/showAddQuery', methods = ['POST','GET'])
 def addQuery():
-	return render_template('addOrder.html')
-
-@app.route('/userHome',methods = ['POST','GET'])
-def getQuery():
 	if request.method == 'GET':
+		return render_template('addOrder.html')
+	else:
 		try:
-			main_list = show_output();
-			return render_template('userHome.html', name = main_list);
-		except Exception as e:
-			return json.dumps({'error':str(e)})
-	else: 
-		try:
-			userQuery();
-			return redirect('/userHome')
+			main_list = userQuery();
+			return render_template('addOrder.html', name = main_list)
 		except Exception as e:
 			return json.dumps({'error':str(e)})
 
+# User Dashboard
+@app.route('/userHome',methods = ['GET'])
+def getQuery():
+	try:
+		main_list = show_output();
+		return render_template('userHome.html', name = main_list);
+	except Exception as e:
+		return json.dumps({'error':str(e)})
+
+# Edit Chart 
 @app.route('/editChart',methods = ['POST','GET'])
 def editChart():
 	
 	if request.method == 'GET':
-		
-		chart_id = request.args.get('chart_num')
-		conn = mysql.connect()
-		cursor = conn.cursor()
-		
-		sql = "SELECT user_query FROM a WHERE uid = %s;" % (chart_id)
-		cursor.execute(sql)
-		data = cursor.fetchall()
-		
+		data, chart_id = get_chart();
 		return render_template('editOrder.html', query = str(data[0][0]), chartID = chart_id);
-	
 	else:
-		
-		chart_type = request.form.get('chartType')
-		chart_id = request.args.get('chart_num')
-
-		conn = mysql.connect()
-		cursor = conn.cursor()
-
-		sql = "UPDATE a SET chart = '%s' WHERE uid = %s;" % (chart_type, chart_id)
-		cursor.execute(sql)
-		conn.commit()
-
+		update_chart();
 		return redirect('/userHome')
+
+# Get chart data for editing
+def get_chart():
+
+	chart_id = request.args.get('chart_num')
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	
+	sql = "SELECT user_query FROM a WHERE uid = %s;" % (chart_id)
+	cursor.execute(sql)
+	data = cursor.fetchall()
+
+	return data,chart_id
+
+# Update chart data
+def update_chart():
+	chart_type = request.form.get('chartType')
+	chart_id = request.args.get('chart_num')
+
+	conn = mysql.connect()
+	cursor = conn.cursor()
+
+	sql = "UPDATE a SET chart = '%s' WHERE uid = %s;" % (chart_type, chart_id)
+	cursor.execute(sql)
+	conn.commit()
 
 # This function returns data that is used to draw charts
 def show_output():
@@ -82,10 +92,7 @@ def show_output():
 		cursor.execute(sql)
 		data = cursor.fetchall()
 		
-		outer_list.append(json.loads(data[0][0]))
-		outer_list.append(str(data[0][1]))
-		outer_list.append(str(data[0][2]))
-		outer_list.append(str(data[0][3]))
+		outer_list = append_list(data,outer_list)
 		main_list.append(outer_list)
 
 	cursor.close() 
@@ -110,14 +117,14 @@ def userQuery():
 
 	if(len(cursor.description) == 3):
 
-		# Find parameters after SELECT
 		val1 = cursor.description[0][0] 
-		val2 = cursor.description[1][0] # month
-		val3 = cursor.description[2][0] # temperature
+		val2 = cursor.description[1][0]
+		val3 = cursor.description[2][0]
 
 		# Find Table Name
 		query_words = sql.split()
 		N = len(query_words)
+		
 		for i in range(N):
 			if query_words[i] == 'FROM' or query_words[i] == 'from':
 				table_name = query_words[i+1]
@@ -150,13 +157,6 @@ def userQuery():
 				'data' : order_list
 			}
 			main.append(series_name)
-		
-		sqlQuery = "INSERT INTO a(query,chart,user_query,xaxis,yaxis) VALUES('%s','%s','%s','%s','%s');" % ((json.dumps(main)),str(chart_type),sql,val2,val3)
-		cursor.execute(sqlQuery)
-		
-		conn.commit()
-		cursor.close() 
-		conn.close()
 
 	else:
 
@@ -175,13 +175,39 @@ def userQuery():
 		}
 
 		main.append(series_name)
-		
-		sqlQuery = "INSERT INTO a(query,chart,user_query,xaxis,yaxis) VALUES('%s','%s','%s','%s','%s');" % ((json.dumps(main)),str(chart_type),sql,val2,val3)
-		cursor.execute(sqlQuery)
+	
+	# Outside of if-else loop
+	sqlQuery = "INSERT INTO a(query,chart,user_query,xaxis,yaxis) VALUES('%s','%s','%s','%s','%s');" % ((json.dumps(main)),str(chart_type),sql,val2,val3)
+	cursor.execute(sqlQuery)
 
-		conn.commit()
-		cursor.close() 
-		conn.close()
+	sqlQuery = "SELECT last_val FROM check_val;"
+	cursor.execute(sqlQuery)
+	data = cursor.fetchall()
+
+	sql = "SELECT query, chart, xaxis, yaxis FROM a WHERE uid = %d;" % (int(data[0][0]))
+	cursor.execute(sql)
+	data = cursor.fetchall()
+	
+	main_list = []
+	outer_list = []
+
+	outer_list = append_list(data,outer_list)
+	main_list.append(outer_list)
+
+	conn.commit()
+	cursor.close() 
+	conn.close()
+
+	return main_list
+
+def append_list(data, outer_list):
+
+	outer_list.append(json.loads(data[0][0]))
+	outer_list.append(str(data[0][1]))
+	outer_list.append(str(data[0][2]))
+	outer_list.append(str(data[0][3]))
+
+	return outer_list
 
 # App Run
 if __name__ == '__main__':

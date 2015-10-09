@@ -15,12 +15,14 @@
     <script>
       $(function () 
       {
+
+        var buttons = Highcharts.getOptions().exporting.buttons.contextButton.menuItems;
+          
         {% for val in name %}
 
           $('#main').append('<div id={{loop.index}} class = "mine" style = "width: 350px; height: 350px; diplay:inline">');
-          $('#main').append('<button href="#" id = {{loop.index}} class = "btn btn-default btn-sm"><span class="glyphicon glyphicon-pencil"></span></button>');
-          $('#{{loop.index}}').highcharts(
-          {
+
+          var hc{{loop.index}} = {
             chart: {
                 type: '{{ val[1]|safe }}'
             },
@@ -40,15 +42,6 @@
                     text: '{{ val[3]|safe }}'
                 }
             },
-            labels: {
-              items: [{
-                style: {
-                    left: '50px',
-                    top: '18px',
-                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
-                }
-              }]
-            },
             legend: {
                 layout: 'vertical',
                 align: 'right',
@@ -62,14 +55,24 @@
                 data: {{ serie['data']|safe}}
             },
             {% endfor %}
-            ]
-          });
-        {% endfor %}
-      
-        $(".btn").click(function() {
-          window.location.replace('/editChart?chart_num='+this.id);
-        });
+            ],
+            exporting: {
+              buttons: {
+                customButton: {
+                  text: "Edit",
+                  id : {{loop.index}},
+                  onclick : function () {
+                    window.location.replace('/editChart?chart_num='+{{loop.index}});
+                  }                
+                }
+              }
+            }
+          }
 
+          $('#{{loop.index}}').highcharts(hc{{loop.index}});
+
+        {% endfor %}
+        
       });
     </script>
   </head>
