@@ -51,10 +51,7 @@ def editChart():
 # Delete Chart
 @app.route('/deleteChart',methods = ['GET'])
 def deleteChart():
-	chart_id = delete_chart();
-	return redirect('/userHome')
 
-def delete_chart():
 	chart_id = request.args.get('chart_num')
 	conn = mysql.connect()
 	cursor = conn.cursor()
@@ -62,8 +59,22 @@ def delete_chart():
 	sql = "DELETE FROM a WHERE uid = %s;" % (chart_id)
 	cursor.execute(sql)
 	conn.commit()
+	return redirect('/userHome')
 
-	return chart_id
+# Store Chart
+@app.route('/storeChart',methods = ['POST'])
+def storeChart():
+	# Store data into 
+	post_id = request.args.get('id')
+	post_chart = json.dumps(request.args.get('chart'))
+	
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	sql = "INSERT INTO charts(hc) VALUES ('%s');" % (post_chart)
+	cursor.execute(sql)
+	conn.commit()
+
+	return "True"
 
 # Get chart data for editing
 def get_chart():

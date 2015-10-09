@@ -4,15 +4,19 @@
 
 3. Create Table check_val
 
-4. Create Table a
+4. Create Table new
 
-5. truncate a;
+5. Create Table a
 
-6. truncate check_val;
+6. truncate a;
 
-7. INSERT INTO check_val(last_val,uid,chart_val) VALUES (0,1,0);
+7. truncate check_val;
 
-Queries ---
+8. INSERT INTO check_val(last_val,uid,chart_val) VALUES (0,1,0);
+
+9. truncate charts;
+
+10. Queries
 
 SELECT city, month, temp FROM temperature ORDER BY city ;
 SELECT city, month, rain FROM temperature ORDER BY city ;

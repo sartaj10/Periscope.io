@@ -56,10 +56,10 @@
 
         $('#{{loop.index}}').highcharts(hc);
 
-        console.log(hc);
+        $.post('/storeChart?id='+'{{loop.index}}'+'&chart=' + JSON.stringify(hc));
 
         {% endfor %}
-        
+
       });
     </script>
 </head>
