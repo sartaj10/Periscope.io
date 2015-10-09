@@ -1,10 +1,10 @@
 import MySQLdb
 
 def connection():
-	db = MySQLdb.connect(host = "localhost",
+	conn = MySQLdb.connect(host = "localhost",
 						   user = "root",
 						   passwd = "zomato",
 						   db = "test2")
-	cursor = db.cursor()
+	cursor = conn.cursor()
 
-	return cursor,db
+	return conn,cursor

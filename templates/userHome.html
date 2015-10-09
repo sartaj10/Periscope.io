@@ -3,6 +3,7 @@
   <head>
 
     <title>User Dashboard</title>
+
     <link href="../static/css/bootstrap.min.css" rel="stylesheet">
     <link href="../static/css/jumbotron-narrow.css" rel="stylesheet">
     <link href="../static/main.css" rel="stylesheet">
@@ -17,7 +18,6 @@
     console.log("YES")
     {% endif %}
     </script>
-
 
     <script>
       $(function () 
@@ -65,13 +65,13 @@
             ],
             exporting: {
               buttons: {
-                custom: {
+                /*custom: {
                   text: "Delete",
                   id : {{loop.index}},
                   onclick : function () {
                     window.location.replace('/deleteChart?chart_num='+{{loop.index}});
                   }                
-                },
+                },*/
                 customButton: {
                   text: "Edit",
                   id : {{loop.index}},

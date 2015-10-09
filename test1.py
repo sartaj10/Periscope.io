@@ -1,16 +1,7 @@
 from flask import Flask, render_template, request, redirect, json, url_for
-from flask.ext.mysql import MySQL
-import sqlparse
+from dbconnect import connection
 
-mysql = MySQL()
 app = Flask(__name__)
-
-# MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'zomato'
-app.config['MYSQL_DATABASE_DB'] = 'test2'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mysql.init_app(app)
 
 # Home Page
 @app.route('/')
@@ -48,28 +39,13 @@ def editChart():
 		main_list, chart_id = update_chart();
 		return render_template('editOrder.html', name = main_list )
 
-# Delete Chart
-@app.route('/deleteChart',methods = ['GET'])
-def deleteChart():
-
-	chart_id = request.args.get('chart_num')
-	conn = mysql.connect()
-	cursor = conn.cursor()
-
-	sql = "DELETE FROM a WHERE uid = %s;" % (chart_id)
-	cursor.execute(sql)
-	conn.commit()
-	return redirect('/userHome')
-
 # Store Chart
 @app.route('/storeChart',methods = ['POST'])
 def storeChart():
-	# Store data into 
 	post_id = request.args.get('id')
 	post_chart = json.dumps(request.args.get('chart'))
 	
-	conn = mysql.connect()
-	cursor = conn.cursor()
+	conn, cursor = connection()
 	sql = "INSERT INTO charts(hc) VALUES ('%s');" % (post_chart)
 	cursor.execute(sql)
 	conn.commit()
@@ -80,9 +56,7 @@ def storeChart():
 def get_chart():
 
 	chart_id = request.args.get('chart_num')
-	conn = mysql.connect()
-	cursor = conn.cursor()
-	
+	conn, cursor = connection()
 	sql = "SELECT user_query, chart FROM a WHERE uid = %s;" % (chart_id)
 	cursor.execute(sql)
 	data = cursor.fetchall()
@@ -94,9 +68,7 @@ def update_chart():
 	chart_type = request.form.get('chartType')
 	chart_id = request.args.get('chart_num')
 
-	conn = mysql.connect()
-	cursor = conn.cursor()
-
+	conn, cursor = connection()
 	sql = "UPDATE a SET chart = '%s' WHERE uid = %s;" % (chart_type, chart_id)
 	cursor.execute(sql)
 	conn.commit()
@@ -121,9 +93,7 @@ def update_chart():
 def show_output():
 	main_list = []
 	
-	conn = mysql.connect()
-	cursor = conn.cursor()
-
+	conn, cursor = connection()
 	cursor.execute("SELECT DISTINCT uid FROM a;")
 	query_indexes = cursor.fetchall()
 
@@ -146,10 +116,9 @@ def show_output():
 
 # This function inputs the user query and stores the returned data
 def userQuery():
-	main = []	
-	conn = mysql.connect()
-	cursor = conn.cursor()
-	
+	main = []
+
+	conn, cursor = connection()	
 	cursor.execute("UPDATE check_val SET last_val = last_val + 1 WHERE uid = 1;")
 	data2 = cursor.fetchall()
 
@@ -254,6 +223,20 @@ def append_list(data, outer_list):
 	outer_list.append(str(data[0][3]))
 
 	return outer_list
+
+'''
+# Delete Chart
+@app.route('/deleteChart',methods = ['GET'])
+def deleteChart():
+
+	chart_id = request.args.get('chart_num')
+
+	conn, cursor = connection()
+	sql = "DELETE FROM a WHERE uid = %s;" % (chart_id)
+	cursor.execute(sql)
+	conn.commit()
+	return redirect('/userHome')
+'''
 
 # App Run
 if __name__ == '__main__':
